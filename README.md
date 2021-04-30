@@ -89,9 +89,9 @@ std::uniform_real_distribution<float> distribution_y(0.0, 15.0);
 
 - **sampling_radius = 0.5**
 
-- **start = [0,0]**
+- **start = [2,1]**
 
-- **goal = [9,11]**
+- **goal = [8,12]**
 
 
 ![](Figure_2.png)

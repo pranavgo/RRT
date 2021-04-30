@@ -16,10 +16,8 @@
 
 // Node definiton 
 struct Node{
-    // x and y position of the node
     float x;
     float y;
-    // Parent Node to the current Node
     Node *parent;
 };
 
@@ -27,17 +25,20 @@ struct Node{
 Node node_list[1000];  
 
 // counter to keep track of no of elements in node_list 
-int count=0;
+int counter=0;
 
 // for finding the final path
 Node location[500];
 
-// for backtracking
-int backtrack = 0;
+// for back propagation
+int backprop = 0;
 
 //Obstcale Points
 //change point to change the location of obstacle
-int obstacle_array[][2]={{3, 7}, {7, 7}, {6, 4}, {4, 4}, {4, 6}, {3, 6}};
+int obstacle_array[][2]={{4,4}, {5, 4}, {5, 6}, {6, 6}, {6,7}, {5, 7}, {5,8}, {4,8}, {4,7}, {3,7}, {3,6}, {4,6}};
+
+//no of elements in obstacle array
+int obstacle_size = sizeof(obstacle_array)/sizeof(obstacle_array[0]);
 
 //  sampling probablity to set rate of sampling
 float sampling_probablity;
@@ -82,7 +83,7 @@ int find_nearest(Node current)
 {
     int nearest_node;
     float minimum_dist= 20;
-    for(int i=0;i<count;i++)
+    for(int i=0;i<counter;i++)
     {
         float dist=distance(current,node_list[i]);
         if(dist<minimum_dist)
@@ -119,7 +120,7 @@ bool check_collision(Node end1, Node end2)
 
     std::vector< point_xy > ObstaclePoints; 
 
-    for(int i=0;i<(sizeof(obstacle_array)/sizeof(obstacle_array[0]));i++)
+    for(int i=0;i<obstacle_size;i++)
     {   
         point_xy point(obstacle_array[i][0] ,obstacle_array[i][1]);
         ObstaclePoints.push_back( point );
@@ -129,80 +130,6 @@ bool check_collision(Node end1, Node end2)
 
     return collision;
 }
-
-//plotting function
-void plotting(bool sucess)
-{   
-    namespace plt = matplotlibcpp;
-    //plot obstacle
-    std::vector<double> x = {};
-    std::vector<double> y = {};
-
-    for(int i=0;i<(sizeof(obstacle_array)/sizeof(obstacle_array[0]));i++)
-    {
-        x.push_back(obstacle_array[i][0]);
-        y.push_back(obstacle_array[i][1]);
-    }
-    x.push_back(obstacle_array[0][0]);
-    y.push_back(obstacle_array[0][1]);
-
-    plt::plot(x, y,"k");
-    
-    //plot of all nodes
-    std::vector<double> scatter_x = {};
-    std::vector<double> scatter_y = {};
-    
-    for(int i=0;i<count;i++)
-    {  
-        
-            scatter_x.push_back(node_list[i].x);
-            scatter_y.push_back(node_list[i].y);
-       
-    }
-
-    plt::plot(scatter_x, scatter_y,".r");
-
-    //plot tree
-    for(int i=0;i<count;i++)
-    {   
-        if(node_list[i].parent != NULL)
-        {
-            std::vector<double> node_x = {};
-            std::vector<double> node_y = {};
-            node_x.push_back(node_list[i].x);
-            node_y.push_back(node_list[i].y);
-            node_x.push_back(node_list[i].parent->x);
-            node_y.push_back(node_list[i].parent->y);
-            plt::plot(node_x, node_y,"r");
-        }
-    }
-
-    if(sucess==1)
-    {
-        //plot final path from start to goal
-        int i = 0;
-        while(i<backtrack)
-        {   
-            if(location[i].parent != NULL)
-            {
-                std::vector<double> node_x = {};
-                std::vector<double> node_y = {};
-                node_x.push_back(location[i].x);
-                node_y.push_back(location[i].y);
-                node_x.push_back(location[i].parent->x);
-                node_y.push_back(location[i].parent->y);
-                plt::plot(node_x, node_y,".b-");
-            }
-            i++;
-        }
-    }
-       
-    plt::grid(true);
-    plt::show();
-
-
-}
-
 //main planner
 bool planner(float start_x, float start_y, float goal_x, float goal_y, float sampling_radius)
 {
@@ -216,8 +143,8 @@ bool planner(float start_x, float start_y, float goal_x, float goal_y, float sam
     int nearest_node;  
 
     //add start to the node_list
-    node_list[count]=start;
-    count++;
+    node_list[counter]=start;
+    counter++;
 
     for (int j=0; j<500;)
     {
@@ -248,8 +175,8 @@ bool planner(float start_x, float start_y, float goal_x, float goal_y, float sam
         else
         {
             sample_node.parent= &node_list[nearest_node];
-            node_list[count]= sample_node;
-            count++;
+            node_list[counter]= sample_node;
+            counter++;
             j++;
 
         }
@@ -258,8 +185,8 @@ bool planner(float start_x, float start_y, float goal_x, float goal_y, float sam
         if(goal_dist<=0.1)
         {
             goal.parent= &sample_node;
-            node_list[count]=goal;
-            count++;
+            node_list[counter]=goal;
+            counter++;
             flag = 0;
             //Goal Reached
             break;
@@ -271,42 +198,116 @@ bool planner(float start_x, float start_y, float goal_x, float goal_y, float sam
         return 0;
     }
         
-    //backtracking to find the final path from goal to start
+    //back propogation to find the final path from goal to start
     Node *current= &goal;
     while(current->parent != NULL)
     {   
-        location[backtrack]=*current;
-        backtrack++;
+        location[backprop]=*current;
+        backprop++;
         current=current->parent;
     }
 
-    location[backtrack]=start;
-    backtrack++;
+    location[backprop]=start;
+    backprop++;
 
     return 1;
 }
+
+//plotting function
+void plotting(bool sucess)
+{   
+    namespace plt = matplotlibcpp;
+    //plot obstacle
+    std::vector<double> obstacle_x = {};
+    std::vector<double> obstacle_y = {};
+
+    for(int i=0;i<obstacle_size;i++)
+    {
+        obstacle_x.push_back(obstacle_array[i][0]);
+        obstacle_y.push_back(obstacle_array[i][1]);
+    }
+    obstacle_x.push_back(obstacle_array[0][0]);
+    obstacle_y.push_back(obstacle_array[0][1]);
+
+    plt::plot(obstacle_x, obstacle_y,"k");
+    
+    //plotiing nodes
+    std::vector<double> scatter_x = {};
+    std::vector<double> scatter_y = {};
+    
+    for(int i=0;i<counter;i++)
+    {  
+        
+            scatter_x.push_back(node_list[i].x);
+            scatter_y.push_back(node_list[i].y);
+       
+    }
+
+    plt::plot(scatter_x, scatter_y,".m");
+
+    //plotting tree
+    for(int i=0;i<counter;i++)
+    {   
+        if(node_list[i].parent != NULL)
+        {
+            std::vector<double> tree_x = {};
+            std::vector<double> tree_y = {};
+            tree_x.push_back(node_list[i].x);
+            tree_y.push_back(node_list[i].y);
+            tree_x.push_back(node_list[i].parent->x);
+            tree_y.push_back(node_list[i].parent->y);
+            plt::plot(tree_x, tree_y,"m");
+        }
+    }
+
+    if(sucess==1)
+    {
+        //plot final path from start to goal
+        int i = 0;
+        while(i<backprop)
+        {   
+            if(location[i].parent != NULL)
+            {
+                std::vector<double> final_x = {};
+                std::vector<double> final_y = {};
+                final_x.push_back(location[i].x);
+                final_y.push_back(location[i].y);
+                final_x.push_back(location[i].parent->x);
+                final_y.push_back(location[i].parent->y);
+                plt::plot(final_x, final_y,".b-");
+            }
+            i++;
+        }
+    }
+       
+    plt::grid(true);
+    plt::show();
+
+
+}
+using namespace std;
 //starting of the main function
 int main()
 {   float start_x, start_y, goal_x, goal_y;
     
     // taking inputs from the user
-    std::cout<<"Enter sampling probablity : ";
-    std::cin>> sampling_probablity;
+    cout<<"Enter sampling probablity : ";
+    cin>> sampling_probablity;
 
-    std::cout<<"Enter sampling radius (prefered to be less than 1): ";
-    std::cin>> sampling_radius;
+    cout<<"Enter sampling radius (prefered to be less than 1): ";
+    cin>> sampling_radius;
 
-    std::cout<<"Enter x postion of start : ";
-    std::cin>> start_x;
+    cout<<"Enter x postion of start : ";
+    cin>> start_x;
     
-    std::cout<<"Enter y postion of start : ";
-    std::cin>> start_y;
+    cout<<"Enter y postion of start : ";
+    cin>> start_y;
 
-    std::cout<<"Enter x postion of goal: ";
-    std::cin>> goal_x;
+    cout<<"Enter x postion of goal: ";
+    cin>> goal_x;
 
-    std::cout<<"Enter y postion of goal : ";
-    std::cin>> goal_y;
+    cout<<"Enter y postion of goal : ";
+    cin>> goal_y;
 
     
     
@@ -325,7 +326,7 @@ int main()
         std::cout<<"goal not reached";
     }
 
-    std::cout<<"Total no of nodes = "<<count<<"\n"<<"No of nodes in final path = "<<backtrack<<"\n";
+    std::cout<<"Total no of nodes = "<<counter<<"\n"<<"No of nodes in final path = "<<backprop<<"\n";
 
     return 0;
 }
