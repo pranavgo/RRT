@@ -15,8 +15,8 @@ sudo apt-get install python2.7-dev
 ```
 - **matplotlib**
 ## Libraries used for implementation
-- Boost::geometry
-- matplotlib-cpp
+- Boost::geometry (https://github.com/boostorg/geometry)
+- matplotlib-cpp (https://github.com/lava/matplotlib-cpp)
 
 ## Installation
 
