@@ -59,9 +59,9 @@ After running the file user needs to give certain inputs:
 ## Setting the map
 
 ### **Defining the obstacle**
-To define the obstacle, you should enter the boundary coordinates of the obstacle in `line 42` of `rrt.cpp` inside the *obstacle_array*:
+To define the obstacle, you should enter the boundary coordinates of the obstacle in `line 38` of `rrt.cpp` inside the *obstacle_array*:
 ```cpp
-int obstacle_array[][2]={{3, 7}, {7, 7}, {6, 4}, {4, 4}, {4, 6}, {3, 6}};
+int obstacle_array[][2]={{4,4}, {5, 4}, {5, 6}, {6, 6}, {6,7}, {5, 7}, {5,8}, {4,8}, {4,7}, {3,7}, {3,6}, {4,6}};
 ```
 The coordinates entered should lie within the search space of the map, they cab be in the form of any polygon.
 

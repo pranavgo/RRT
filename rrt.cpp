@@ -182,6 +182,7 @@ bool planner(float start_x, float start_y, float goal_x, float goal_y, float sam
         }
 
         float goal_dist=distance(sample_node,goal);
+        // to check if we have reached the goal, tolerance of 0.1 is considered
         if(goal_dist<=0.1)
         {
             goal.parent= &sample_node;
@@ -206,7 +207,8 @@ bool planner(float start_x, float start_y, float goal_x, float goal_y, float sam
         backprop++;
         current=current->parent;
     }
-
+     
+    // to add the starting node 
     location[backprop]=start;
     backprop++;
 
@@ -279,7 +281,17 @@ void plotting(bool sucess)
             i++;
         }
     }
-       
+    // plotting start and goal
+    std::vector<double> starting_x = {};
+    std::vector<double> starting_y = {};
+    starting_x.push_back(location[0].x);
+    starting_y.push_back(location[0].y);
+    plt::plot(starting_x,starting_y,".k");   
+    std::vector<double> ending_x = {};
+    std::vector<double> ending_y = {};
+    ending_x.push_back(location[backprop].x);
+    ending_y.push_back(location[backprop].y);
+    plt::plot(ending_x,ending_y,".k");  
     plt::grid(true);
     plt::show();
 
