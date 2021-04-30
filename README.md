@@ -68,8 +68,8 @@ The coordinates entered should lie within the search space of the map, they cab 
 ### **Search Space**
 The range of search space can be changed by changing th Max and Min valyes of the distribution_x and distribution_y in `line 54` and `line 55` respectively in `rrt.cpp` 
 ```cpp
-    std::uniform_real_distribution<float> distribution_x(0.0, 15.0);
-	std::uniform_real_distribution<float> distribution_y(0.0, 15.0);
+std::uniform_real_distribution<float> distribution_x(0.0, 15.0);
+std::uniform_real_distribution<float> distribution_y(0.0, 15.0);
 ```
 ## Example Plots
 
